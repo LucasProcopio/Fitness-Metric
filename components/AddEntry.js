@@ -6,6 +6,7 @@ import Stepper from './Stepper'
 import DateHeader from './DateHeader'
 import { Ionicons } from '@expo/vector-icons'
 import TextButton from './TextButton'
+import { submitEntry, removeEntry } from '../utils/api'
 
 function SubmitBtn({ onPress }) {
   return (
@@ -68,14 +69,14 @@ export default class AddEntry extends React.Component {
     })
 
     //todo:  Navigate to home
-    //todo: save to DB
+    submitEntry({ key, entry })
     //todo: clear local notifications
   }
 
   reset = () => {
     const key = timeToString()
 
-    //todo: update redux , route to home , DB
+    removeEntry(key)
   }
   render() {
     const metaInfo = getMetricMetaInfo()
