@@ -81,8 +81,8 @@ export function getMetricMetaInfo (metric) {
         )
       }
     },
-    swin: {
-      displayName: 'Swin',
+    swim: {
+      displayName: 'Swim',
       max: 9900,
       unit: 'meters',
       step: 100,
@@ -90,7 +90,7 @@ export function getMetricMetaInfo (metric) {
       getIcon () {
         return (
           <View>
-            <MaterialCommunityIcons name="swin" color={'black'} size={35} />
+            <MaterialCommunityIcons name="swim" color={'black'} size={35} />
           </View>
         )
       }
