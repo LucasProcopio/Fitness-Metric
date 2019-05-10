@@ -16,8 +16,6 @@ import { submitEntry, removeEntry } from '../utils/api'
 import { connect } from 'react-redux'
 import { addEntry } from '../actions'
 import { getDailyReminderValue } from '../utils/helpers'
-import { white } from 'ansi-colors'
-import { purple } from '../utils/colors'
 
 function SubmitBtn({ onPress }) {
   return (
@@ -115,7 +113,7 @@ class AddEntry extends React.Component {
             size={100}
           />
           <Text>You already logged your information for today</Text>
-          <TextButton style={{ paddgin: 10 }} onPress={this.reset}>
+          <TextButton style={{ padding: 10 }} onPress={this.reset}>
             Reset
           </TextButton>
         </View>
