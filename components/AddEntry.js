@@ -1,106 +1,94 @@
-import React from 'react'
+import React, { Component } from 'react'
+import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native'
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  StyleSheet
-} from 'react-native'
-import { getMetricMetaInfo, timeToString } from '../utils/helpers'
-import SliderFit from './SliderFit'
-import Stepper from './Stepper'
+  getMetricMetaInfo,
+  timeToString,
+  getDailyReminderValue
+} from '../utils/helpers'
+import UdaciSlider from './UdaciSlider'
+import UdaciSteppers from './UdaciSteppers'
 import DateHeader from './DateHeader'
 import { Ionicons } from '@expo/vector-icons'
 import TextButton from './TextButton'
 import { submitEntry, removeEntry } from '../utils/api'
 import { connect } from 'react-redux'
 import { addEntry } from '../actions'
-import { getDailyReminderValue } from '../utils/helpers'
+import { purple, white } from '../utils/colors'
+import { NavigationActions } from 'react-navigation'
 
-function SubmitBtn({ onPress }) {
+function SubmitBtn ({ onPress }) {
   return (
     <TouchableOpacity
-      onPress={onPress}
-      style={
-        Platform.OS === 'ios' ? styles.iosSubmitBtn : styles.androidSubmitBtn
-      }
-    >
-      <Text style={styles.SubmitBtnText}>SUBMIT</Text>
+      style={Platform.OS === 'ios' ? styles.iosSubmitBtn : styles.AndroidSubmitBtn}
+      onPress={onPress}>
+        <Text style={styles.submitBtnText}>SUBMIT</Text>
     </TouchableOpacity>
   )
 }
-
-class AddEntry extends React.Component {
+class AddEntry extends Component {
   state = {
     run: 0,
     bike: 0,
     swim: 0,
     sleep: 0,
-    eat: 0
+    eat: 0,
   }
-
-  increment = metric => {
+  increment = (metric) => {
     const { max, step } = getMetricMetaInfo(metric)
 
-    this.setState(currState => {
-      const count = currState[metric] + step
+    this.setState((state) => {
+      const count = state[metric] + step
 
       return {
-        ...currState,
-        [metric]: count > max ? max : count
+        ...state,
+        [metric]: count > max ? max : count,
       }
     })
   }
-
-  decrement = metric => {
-    this.setState(currState => {
-      const count = currState[metric] - getMetricMetaInfo(metric).step
+  decrement = (metric) => {
+    this.setState((state) => {
+      const count = state[metric] - getMetricMetaInfo(metric).step
 
       return {
-        ...currState,
-        [metric]: count < 0 ? 0 : count
+        ...state,
+        [metric]: count < 0 ? 0 : count,
       }
     })
   }
-
   slide = (metric, value) => {
     this.setState(() => ({
       [metric]: value
     }))
   }
-
   submit = () => {
     const key = timeToString()
     const entry = this.state
 
-    this.props.dispatch(
-      addEntry({
-        [key]: entry
-      })
-    )
+    this.props.dispatch(addEntry({
+      [key]: entry
+    }))
 
-    this.setState({
-      run: 0,
-      bike: 0,
-      swim: 0,
-      sleep: 0,
-      eat: 0
-    })
+    this.setState(() => ({ run: 0, bike: 0, swim: 0, sleep: 0, eat: 0 }))
 
-    //todo:  Navigate to home
+    this.toHome()
+
     submitEntry({ key, entry })
-    //todo: clear local notifications
-  }
 
+    // Clear local notification
+  }
   reset = () => {
     const key = timeToString()
 
-    this.props.dispatch(
-      addEntry({
-        [key]: getDailyReminderValue()
-      })
-    )
+    this.props.dispatch(addEntry({
+      [key]: getDailyReminderValue()
+    }))
+
+    this.toHome()
+
     removeEntry(key)
+  }
+  toHome = () => {
+    this.props.navigation.dispatch(NavigationActions.back({key: 'AddEntry'}))
   }
   render() {
     const metaInfo = getMetricMetaInfo()
@@ -109,39 +97,39 @@ class AddEntry extends React.Component {
       return (
         <View style={styles.center}>
           <Ionicons
-            name={Platform.OS === 'ios' ? 'ios-happy' : 'md-happy'}
+            name={Platform.OS === 'ios' ? 'ios-happy-outline' : 'md-happy'}
             size={100}
           />
-          <Text>You already logged your information for today</Text>
-          <TextButton style={{ padding: 10 }} onPress={this.reset}>
+          <Text>You already logged your information for today.</Text>
+          <TextButton style={{padding: 10}} onPress={this.reset}>
             Reset
           </TextButton>
         </View>
       )
     }
+
     return (
       <View style={styles.container}>
-        <DateHeader date={new Date().toLocaleDateString()} />
-        {Object.keys(metaInfo).map(key => {
+        <DateHeader date={(new Date()).toLocaleDateString()}/>
+        {Object.keys(metaInfo).map((key) => {
           const { getIcon, type, ...rest } = metaInfo[key]
           const value = this.state[key]
 
           return (
             <View key={key} style={styles.row}>
               {getIcon()}
-              {type === 'slider' ? (
-                <SliderFit
-                  value={value}
-                  onChange={value => this.slide(key, value)}
-                  {...rest}
-                />
-              ) : (
-                <Stepper
-                  value={value}
-                  onIncrement={() => this.increment(key)}
-                  onDecrement={() => this.decrement(key)}
-                />
-              )}
+              {type === 'slider'
+                ? <UdaciSlider
+                    value={value}
+                    onChange={(value) => this.slide(key, value)}
+                    {...rest}
+                  />
+                : <UdaciSteppers
+                    value={value}
+                    onIncrement={() => this.increment(key)}
+                    onDecrement={() => this.decrement(key)}
+                    {...rest}
+                  />}
             </View>
           )
         })}
@@ -155,47 +143,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: 'white'
+    backgroundColor: white
   },
   row: {
     flexDirection: 'row',
     flex: 1,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   iosSubmitBtn: {
-    backgroundColor: 'purple',
+    backgroundColor: purple,
     padding: 10,
     borderRadius: 7,
     height: 45,
     marginLeft: 40,
-    marginRight: 40
+    marginRight: 40,
   },
-  androidSubmitBtn: {
-    backgroundColor: 'purple',
+  AndroidSubmitBtn: {
+    backgroundColor: purple,
     padding: 10,
-    borderRadius: 2,
+    paddingLeft: 30,
+    paddingRight: 30,
     height: 45,
-    marginLeft: 30,
-    marginRight: 30,
+    borderRadius: 2,
     alignSelf: 'flex-end',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-  SubmitBtnText: {
-    color: 'white',
+  submitBtnText: {
+    color: white,
     fontSize: 22,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 30,
-    marginRight: 30
-  }
+    marginRight: 30,
+  },
 })
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
   const key = timeToString()
 
   return {
@@ -203,4 +191,6 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps)(AddEntry)
+export default connect(
+  mapStateToProps
+)(AddEntry)

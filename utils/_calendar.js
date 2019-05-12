@@ -1,3 +1,5 @@
+// Utilities for backfilling the calendar.
+
 import { AsyncStorage } from 'react-native'
 import { getMetricMetaInfo, timeToString } from './helpers'
 
@@ -16,16 +18,15 @@ function setDummyData () {
   for (let i = -183; i < 0; i++) {
     const time = timestamp + i * 24 * 60 * 60 * 1000
     const strTime = timeToString(time)
-    dummyData[strTime] =
-      getRandomNumber(3) % 2 === 0
-        ? {
+    dummyData[strTime] = getRandomNumber(3) % 2 === 0
+      ? {
           run: getRandomNumber(run.max),
           bike: getRandomNumber(bike.max),
           swim: getRandomNumber(swim.max),
           sleep: getRandomNumber(sleep.max),
-          eat: getRandomNumber(eat.max)
+          eat: getRandomNumber(eat.max),
         }
-        : null
+      : null
   }
 
   AsyncStorage.setItem(CALENDAR_STORAGE_KEY, JSON.stringify(dummyData))
