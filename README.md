@@ -7,8 +7,8 @@
 ## Installation
 
 * Clone or Download this repository
-* Enter the root folder of the repository and run `npm install` or `yarn`
-* After all the dependencies are installed run `npm start` or `yarn start` to initilize
+* Enter the root folder of the repository and run `yarn`
+* After all the dependencies are installed run `yarn start` to initilize
 * Download the expo application from _app store_ or _google play_ then Scan the QR code 
  to open the project in your phone.
 ---
